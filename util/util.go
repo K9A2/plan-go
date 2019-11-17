@@ -5,6 +5,7 @@ import (
   "fmt"
   "io/ioutil"
   "os"
+  "time"
 )
 
 func Usage() {
@@ -27,15 +28,25 @@ func Usage() {
 
 // Entry for each plan item
 type PlanItem struct {
-  PlanId       string     `json:"plan_id"`
-  Date         string     `json:"date"`
-  Title        string     `json:"title"`
-  ChildrenPlan []PlanItem `json:"children_plan"`
+  PlanId       string      `json:"plan_id"`
+  Date         string      `json:"date"`
+  Title        string      `json:"title"`
+  ChildrenPlan []*PlanItem `json:"children_plan"`
 }
 
 // Root entry for plan list
 type PlanList struct {
-  MajorPlan []PlanItem `json:"major_plan"`
+  MajorPlan []*PlanItem `json:"major_plan"`
+}
+
+func NewPlanItem(title string) *PlanItem {
+  planIdString := fmt.Sprintf("%x", time.Now().UnixNano())
+  return &PlanItem{
+    PlanId:       planIdString[len(planIdString)-8:],
+    Date:         time.Now().Format("Mon Jan 2 15:04:05 -0700 MST 2006"),
+    Title:        title,
+    ChildrenPlan: nil,
+  }
 }
 
 // Parse PlanList object from json file
@@ -69,7 +80,7 @@ func SaveAsJsonFile(filePath string, planList *PlanList) error {
   return err
 }
 
-func PrintPlanSlice(planSlice *[]PlanItem, parentIndex string, indentCount int) {
+func PrintPlanSlice(planSlice *[]*PlanItem, parentIndex string, indentCount int) {
   // prepare prefix
   prefix := ""
   for i := 0; i < indentCount; i++ {
@@ -80,12 +91,28 @@ func PrintPlanSlice(planSlice *[]PlanItem, parentIndex string, indentCount int) 
     item := (*planSlice)[i]
     index := ""
     if parentIndex != "" {
-      index = parentIndex + fmt.Sprintf(".%d", i + 1)
+      index = parentIndex + fmt.Sprintf(".%d", i+1)
     } else {
-      index = parentIndex + fmt.Sprintf("%d", i + 1)
+      index = parentIndex + fmt.Sprintf("%d", i+1)
     }
     fmt.Printf("%s%s plan id:<%s>, date: <%s>\n", prefix, index, item.PlanId, item.Date)
     fmt.Printf("%s%s\n", prefix+DefaultIndent, item.Title)
-    PrintPlanSlice(&item.ChildrenPlan, index, indentCount + 1)
+    PrintPlanSlice(&item.ChildrenPlan, index, indentCount+1)
   }
+}
+
+func LocateParentPlan(currentPlan *PlanItem, planId string) *PlanItem {
+  if currentPlan == nil {
+    return nil
+  }
+  if currentPlan.PlanId == planId {
+    return currentPlan
+  }
+  for _, child := range currentPlan.ChildrenPlan {
+    result := LocateParentPlan(child, planId)
+    if result != nil {
+      return result
+    }
+  }
+  return nil
 }
