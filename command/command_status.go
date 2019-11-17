@@ -23,6 +23,11 @@ func (command statusCommand) Execute() error {
   if err != nil {
     return err
   }
+  if len(planList.MajorPlan) == 0 {
+    fmt.Println("There are no plans yet.")
+    return nil
+  }
+
   util.PrintPlanSlice(&planList.MajorPlan, "", 0)
   return nil
 }
