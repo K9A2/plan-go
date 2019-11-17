@@ -29,6 +29,7 @@ func Usage() {
 // Entry for each plan item
 type PlanItem struct {
   PlanId       string      `json:"plan_id"`
+  Status       string      `json:"status"`
   Date         string      `json:"date"`
   Title        string      `json:"title"`
   ChildrenPlan []*PlanItem `json:"children_plan"`
@@ -43,6 +44,7 @@ func NewPlanItem(title string) *PlanItem {
   planIdString := fmt.Sprintf("%x", time.Now().UnixNano())
   return &PlanItem{
     PlanId:       planIdString[len(planIdString)-8:],
+    Status:       StatusUndone,
     Date:         time.Now().Format("Mon Jan 2 15:04:05 -0700 MST 2006"),
     Title:        title,
     ChildrenPlan: nil,
@@ -95,13 +97,13 @@ func PrintPlanSlice(planSlice *[]*PlanItem, parentIndex string, indentCount int)
     } else {
       index = parentIndex + fmt.Sprintf("%d", i+1)
     }
-    fmt.Printf("%s%s plan id:<%s>, date: <%s>\n", prefix, index, item.PlanId, item.Date)
+    fmt.Printf("%s%s plan id:<%s>, status: <%s>, date: <%s>\n", prefix, index, item.PlanId, item.Status, item.Date)
     fmt.Printf("%s%s\n", prefix+DefaultIndent, item.Title)
     PrintPlanSlice(&item.ChildrenPlan, index, indentCount+1)
   }
 }
 
-func LocateParentPlan(currentPlan *PlanItem, planId string) *PlanItem {
+func FindPlan(currentPlan *PlanItem, planId string) *PlanItem {
   if currentPlan == nil {
     return nil
   }
@@ -109,10 +111,20 @@ func LocateParentPlan(currentPlan *PlanItem, planId string) *PlanItem {
     return currentPlan
   }
   for _, child := range currentPlan.ChildrenPlan {
-    result := LocateParentPlan(child, planId)
+    result := FindPlan(child, planId)
     if result != nil {
       return result
     }
   }
   return nil
+}
+
+func MarkAsDone(currentPlan *PlanItem) {
+  if currentPlan == nil {
+    return
+  }
+  currentPlan.Status = StatusDone
+  for _, child := range currentPlan.ChildrenPlan {
+    MarkAsDone(child)
+  }
 }

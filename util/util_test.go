@@ -52,7 +52,7 @@ func TestLocateParentPlan(t *testing.T) {
   targetPlanId := "f69fb1aa"
   var parentPlan *PlanItem
   for _, root := range planList.MajorPlan {
-    result := LocateParentPlan(root, targetPlanId)
+    result := FindPlan(root, targetPlanId)
     if result != nil {
       parentPlan = result
       break
@@ -69,4 +69,34 @@ func TestLocateParentPlan(t *testing.T) {
     fmt.Println(err.Error())
     return
   }
+}
+
+func TestMarkAsDone(t *testing.T) {
+  planList, err := ReadFromJsonFile(DefaultFilePath)
+  if err != nil {
+    fmt.Println(err.Error())
+    return
+  }
+
+  var targetPlan *PlanItem
+  for _, plan := range planList.MajorPlan {
+    result := FindPlan(plan, "9ae5f9f2")
+    if result != nil {
+      targetPlan = result
+      break
+    }
+  }
+  if targetPlan == nil {
+    fmt.Println("plan not exists")
+    return
+  }
+
+  // mark it and its children as done
+  MarkAsDone(targetPlan)
+  err = SaveAsJsonFile(DefaultFilePath, planList)
+  if err != nil {
+    fmt.Println(err.Error())
+    return
+  }
+  return
 }

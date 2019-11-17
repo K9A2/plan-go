@@ -49,7 +49,7 @@ func (command *addCommand) Execute() error {
     targetPlanId := command.args[2]
     var parentPlan *util.PlanItem
     for _, root := range planList.MajorPlan {
-      result := util.LocateParentPlan(root, targetPlanId)
+      result := util.FindPlan(root, targetPlanId)
       if result != nil {
         parentPlan = result
         break

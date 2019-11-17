@@ -11,4 +11,7 @@ const (
 
   DefaultFilePath = "data.json"
   DefaultIndent = "  "
+
+  StatusDone = "done"
+  StatusUndone = "undone"
 )
