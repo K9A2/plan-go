@@ -1,6 +1,6 @@
 # plan-go
 
-`plan-go` is a simple and stupid plan management utility tool. It provides interface similar to `git`.
+`plan-go` is a simple and stupid plan management utility tool.
 
 ## Usage
 
