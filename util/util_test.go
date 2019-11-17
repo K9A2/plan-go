@@ -39,8 +39,17 @@ func TestSaveAsJsonFile(t *testing.T) {
       },
     },
   }
-  err := SaveAsJsonFile("data.json", planList)
+  err := SaveAsJsonFile(DefaultFilePath, planList)
   if err != nil {
     fmt.Println(err.Error())
   }
+}
+
+func TestPrintPlanSlice(t *testing.T) {
+  planList, err := ReadFromJsonFile(DefaultFilePath)
+  if err != nil {
+    fmt.Print(err.Error())
+    return
+  }
+  PrintPlanSlice(&planList.MajorPlan, "", 0)
 }

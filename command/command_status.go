@@ -1,12 +1,14 @@
 package command
 
-import "fmt"
+import (
+  "fmt"
+  "github.com/stormlin/plan-go/util"
+)
 
 type statusCommand struct {
 }
 
 func NewStatusCommand() *statusCommand {
-  fmt.Println("status")
   return &statusCommand{}
 }
 
@@ -17,5 +19,10 @@ func (command statusCommand) usage() {
 }
 
 func (command statusCommand) Execute() error {
+  planList, err := util.ReadFromJsonFile(util.DefaultFilePath)
+  if err != nil {
+    return err
+  }
+  util.PrintPlanSlice(&planList.MajorPlan, "", 0)
   return nil
 }

@@ -68,3 +68,24 @@ func SaveAsJsonFile(filePath string, planList *PlanList) error {
   err = ioutil.WriteFile(filePath, file, 0644)
   return err
 }
+
+func PrintPlanSlice(planSlice *[]PlanItem, parentIndex string, indentCount int) {
+  // prepare prefix
+  prefix := ""
+  for i := 0; i < indentCount; i++ {
+    prefix = prefix + DefaultIndent
+  }
+  // print the plans recursively
+  for i := 0; i < len(*planSlice); i++ {
+    item := (*planSlice)[i]
+    index := ""
+    if parentIndex != "" {
+      index = parentIndex + fmt.Sprintf(".%d", i + 1)
+    } else {
+      index = parentIndex + fmt.Sprintf("%d", i + 1)
+    }
+    fmt.Printf("%s%s plan id:<%s>, date: <%s>\n", prefix, index, item.PlanId, item.Date)
+    fmt.Printf("%s%s\n", prefix+DefaultIndent, item.Title)
+    PrintPlanSlice(&item.ChildrenPlan, index, indentCount + 1)
+  }
+}

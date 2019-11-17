@@ -8,4 +8,7 @@ const (
   CommandReopen  = "reopen"
   CommandDelete  = "delete"
   CommandRetitle = "retitle"
+
+  DefaultFilePath = "data.json"
+  DefaultIndent = "  "
 )
