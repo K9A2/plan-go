@@ -128,3 +128,13 @@ func MarkAsDone(currentPlan *PlanItem) {
     MarkAsDone(child)
   }
 }
+
+func MarkAsOpen(currentPlan *PlanItem) {
+  if currentPlan == nil {
+    return
+  }
+  currentPlan.Status = StatusUndone
+  for _, child := range currentPlan.ChildrenPlan {
+    MarkAsOpen(child)
+  }
+}

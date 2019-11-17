@@ -31,7 +31,7 @@ func main() {
     err = statusCommand.Execute()
     break
   case util.CommandReopen:
-    reopenCommand := command.NewReopenCommand(args)
+    reopenCommand := command.NewReopenCommand(args[1:])
     err = reopenCommand.Execute()
     break
   case util.CommandDelete:
