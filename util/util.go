@@ -119,6 +119,21 @@ func FindPlan(currentPlan *PlanItem, planId string) *PlanItem {
   return nil
 }
 
+func FindParent(currentPlan *PlanItem, childPlanId string) *PlanItem {
+  if currentPlan == nil {
+    return nil
+  }
+  for _, child := range currentPlan.ChildrenPlan {
+    if child.PlanId == childPlanId {
+      return currentPlan
+    }
+  }
+  for _, child := range currentPlan.ChildrenPlan {
+    return FindParent(child, childPlanId)
+  }
+  return nil
+}
+
 func MarkAsDone(currentPlan *PlanItem) {
   if currentPlan == nil {
     return
@@ -137,4 +152,15 @@ func MarkAsOpen(currentPlan *PlanItem) {
   for _, child := range currentPlan.ChildrenPlan {
     MarkAsOpen(child)
   }
+}
+
+func RemovePlan(list *[]*PlanItem, index int) error {
+  if index < 0 || index > len(*list) {
+    return &IndexOutOfRangeError{}
+  }
+  copy((*list)[index:], (*list)[index+1:])
+  (*list)[len(*list)-1] = nil
+  *list = (*list)[:len(*list)-1]
+
+  return nil
 }

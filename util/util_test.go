@@ -100,3 +100,65 @@ func TestMarkAsDone(t *testing.T) {
   }
   return
 }
+
+func TestFindParent(t *testing.T) {
+  planList, err := ReadFromJsonFile(DefaultFilePath)
+  if err != nil {
+    fmt.Println(err.Error())
+    return
+  }
+  targetPlanId := "9ae5f9f2"
+  var parentPlan *PlanItem
+  var majorPlanToRemove *PlanItem
+  var majorPlanToRemoveIndex int
+  var targetIndex = -1
+  for index, major := range planList.MajorPlan {
+    if major.PlanId == targetPlanId {
+      // remove this major plan
+      majorPlanToRemove = major
+      majorPlanToRemoveIndex = index
+      break
+    }
+    result := FindParent(major, targetPlanId)
+    if result != nil {
+      parentPlan = result
+    }
+  }
+  if majorPlanToRemove != nil {
+    // remove a major plan
+    err = RemovePlan(&planList.MajorPlan, majorPlanToRemoveIndex)
+    if err != nil {
+      fmt.Printf("err in removing a major plan, err: <%s>\n", err.Error())
+      return
+    }
+    goto saveFile
+  }
+
+  // remove a child plan
+  if parentPlan == nil {
+    fmt.Print("parent plan not found")
+    return
+  }
+  for index, child := range parentPlan.ChildrenPlan {
+    if child.PlanId == targetPlanId {
+      targetIndex = index
+      break
+    }
+  }
+  if targetIndex == -1 {
+    fmt.Println("error in locating child plan")
+    return
+  }
+  err = RemovePlan(&parentPlan.ChildrenPlan, targetIndex)
+  if err != nil {
+    fmt.Printf("error in removing plan")
+    return
+  }
+
+saveFile:
+  err = SaveAsJsonFile(DefaultFilePath, planList)
+  if err != nil {
+    fmt.Print("error in saving json file")
+    return
+  }
+}
