@@ -40,4 +40,16 @@ $ plan retitle 11ff22 `a new title`
 
 # Build
 
-Run `make` to execute makefile, and built file will be placed in `build/`.
+Run `make` to execute makefile, and built file will be placed in `build/`. Run 
+as root to gain permission for install/uninstall operations.
+
+```text
+Install built files to /usr/local/plan, and create link at /usr/bin/plan
+# make install 
+
+Uninstall program
+# make uninstall
+
+Clean built destination
+# make clean
+```

@@ -9,7 +9,7 @@ const (
   CommandDelete  = "delete"
   CommandRetitle = "retitle"
 
-  DefaultFilePath = "data.json"
+  DefaultFilePath = "/usr/local/plan/data.json"
   DefaultIndent = "  "
 
   StatusDone = "done"
