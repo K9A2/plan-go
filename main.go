@@ -47,7 +47,7 @@ func main() {
   }
 
   if err != nil {
-    fmt.Printf("Runtime error, err: \"%s\"", err.Error())
+    fmt.Printf("Runtime error, err: \"%s\"\n", err.Error())
     return
   }
   return
