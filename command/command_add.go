@@ -37,6 +37,7 @@ func (command *addCommand) Execute() error {
     if err != nil {
       return err
     }
+    return nil
   }
 
   if len(command.args) == 3 && command.args[1] == "-p" {
