@@ -14,4 +14,6 @@ const (
 
   StatusDone = "done"
   StatusUndone = "undone"
+
+  ElementNotFoundIndex = -1
 )

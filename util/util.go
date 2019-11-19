@@ -119,19 +119,25 @@ func FindPlan(currentPlan *PlanItem, planId string) *PlanItem {
   return nil
 }
 
-func FindParent(currentPlan *PlanItem, childPlanId string) *PlanItem {
+// Find the target plan's parent plan, and corresponding index in child list
+// result (nil -1) means the target plan is not one of currentPlan's child
+func FindParent(currentPlan *PlanItem, childPlanId string) (*PlanItem, int) {
   if currentPlan == nil {
-    return nil
+    return nil, ElementNotFoundIndex
   }
-  for _, child := range currentPlan.ChildrenPlan {
+  for index, child := range currentPlan.ChildrenPlan {
     if child.PlanId == childPlanId {
-      return currentPlan
+      // plan to be removed is one of its child
+      return currentPlan, index
+    }
+    // find recursively in its children
+    parentPlan, childIndex := FindParent(child, childPlanId)
+    if parentPlan != nil {
+      // we found it!
+      return parentPlan, childIndex
     }
   }
-  for _, child := range currentPlan.ChildrenPlan {
-    return FindParent(child, childPlanId)
-  }
-  return nil
+  return nil, ElementNotFoundIndex
 }
 
 func MarkAsDone(currentPlan *PlanItem) {

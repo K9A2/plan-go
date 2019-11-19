@@ -30,11 +30,16 @@ func (command deleteCommand) Execute() error {
   }
 
   targetPlanId := command.args[0]
-  var parentPlan *util.PlanItem
+
+  // going to remove a major plan
   var majorPlanToRemove *util.PlanItem
   var majorPlanToRemoveIndex int
-  var targetIndex = -1
 
+  // going to remove a child plan
+  var parentPlan *util.PlanItem
+  var childIndex = util.ElementNotFoundIndex
+
+  // check major plan first
   for index, major := range planList.MajorPlan {
     if major.PlanId == targetPlanId {
       // remove this major plan
@@ -42,9 +47,11 @@ func (command deleteCommand) Execute() error {
       majorPlanToRemoveIndex = index
       break
     }
-    result := util.FindParent(major, targetPlanId)
-    if result != nil {
-      parentPlan = result
+    // target may be one of its child
+    parentPlan, childIndex = util.FindParent(major, targetPlanId)
+    if parentPlan != nil {
+      // we found its parent!
+      break
     }
   }
   if majorPlanToRemove != nil {
@@ -60,13 +67,7 @@ func (command deleteCommand) Execute() error {
   if parentPlan == nil {
     return &util.ParentPlanNotFoundError{}
   }
-  for index, child := range parentPlan.ChildrenPlan {
-    if child.PlanId == targetPlanId {
-      targetIndex = index
-      break
-    }
-  }
-  err = util.RemovePlan(&parentPlan.ChildrenPlan, targetIndex)
+  err = util.RemovePlan(&parentPlan.ChildrenPlan, childIndex)
   if err != nil {
     return err
   }
